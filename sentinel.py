@@ -125,6 +125,14 @@ def fetch_market_confluence(state_db):
         print(f"Error fetching SLV shares: {e}")
         data["vault_change_pct"] = 0.0
         
+    # 3. Gold/Silver Ratio (GSR)
+    try:
+        gc = yf.Ticker("GC=F").history(period="1d")["Close"].iloc[-1]
+        si_close = yf.Ticker("SI=F").history(period="1d")["Close"].iloc[-1]
+        data["gsr"] = round(float(gc / si_close), 2)
+    except:
+        data["gsr"] = 80.0
+        
     data["nifty_pe"] = NIFTY_PE
     data["nifty_pb"] = NIFTY_PB
     data["active_rung"] = state_db.get_target_rung()
@@ -138,6 +146,7 @@ def build_daily_briefing(state_db):
     nifty_pb = macro["nifty_pb"]
     vault_trend = macro["vault_change_pct"]
     active_rung = macro["active_rung"]
+    gsr = macro["gsr"]
     
     now_ist = datetime.datetime.utcnow() + datetime.timedelta(hours=5, minutes=30)
     is_monday = (now_ist.weekday() == 0)
@@ -173,8 +182,28 @@ def build_daily_briefing(state_db):
     # Condition E (Status Normal)
     else:
         subject = "All okay keep holding"
-        body = f"STATUS NORMAL: Market is breathing safely at ₹{price:,.2f}.\n\nActive Target Rung: ₹{active_rung:,.2f}\nMacro Anchor Status:\n- SLV Physical Trend: {vault_trend:+.2f}%\n- Nifty 50 P/E: {nifty_pe}\n- Nifty 50 P/B: {nifty_pb}\n\nClose your brokerage app and ignore the market."
+        body = f"STATUS NORMAL: Market is breathing safely at ₹{price:,.2f}.\n\nActive Target Rung: ₹{active_rung:,.2f}\nMacro Anchor Status:\n- SLV Physical Trend: {vault_trend:+.2f}%\n- Nifty 50 P/E: {nifty_pe}\n- Nifty 50 P/B: {nifty_pb}\n- Gold/Silver Ratio: {gsr}\n\nClose your brokerage app and ignore the market."
         
+    footer = """
+    
+--------------------------------------------------
+HOW TO READ THIS EMAIL (Plain English Guide):
+- What is this? This is an automated robot that watches your silver investments and the stock market every morning.
+- What should I do? Only take action if the email subject says "Warning" or "Sell today". If it says "All okay keep holding", do absolutely nothing and go about your day.
+- What are these numbers?
+  * Silver Price: The true, tax-adjusted cost of 1kg of silver in India.
+  * Target Rung: The price silver needs to hit before we sell a small 5% chunk for profit.
+  * SLV Trend: Measures physical silver supply. 
+      [GOOD] = Negative or close to 0% (vaults are emptying, meaning high demand). 
+      [BAD] = Above 3% (institutions are dumping physical silver back into vaults).
+  * Nifty P/E & P/B: These measure if the Indian stock market is cheap or expensive. 
+      [GOOD] = P/E below 22.5 and P/B below 3.8 means stocks are reasonably priced. We can safely buy them.
+      [BAD] = P/E above 22.5 or P/B above 3.8 means stocks are in a dangerous, expensive bubble. The robot will actively block you from buying them.
+  * Gold/Silver Ratio (GSR): Measures how many ounces of silver it takes to buy 1 ounce of gold. 
+      [GOOD] = A high number (80+) means silver is very cheap compared to gold. 
+      [BAD] = A low number (<60) means silver is becoming extremely expensive and we should look to sell.
+"""
+    body += footer
     return subject, body
 
 def dispatch_sentinel_email():
