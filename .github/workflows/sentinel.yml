@@ -2,9 +2,8 @@ name: Silver ETF Sentinel Daily Run
 
 on:
   schedule:
-    # 30 2 * * 1-5 runs at 02:30 UTC (which is 08:00 AM IST)
-    # Note: If you specifically want 07:30 AM IST, you should change this to '0 2 * * 1-5'
-    - cron: '30 2 * * 1-5'
+    # 0 2 * * 1-5 runs at 02:00 UTC (which is exactly 07:30 AM IST)
+    - cron: '0 2 * * 1-5'
   workflow_dispatch: # Allows you to manually trigger it from the GitHub UI for testing
 
 jobs:
