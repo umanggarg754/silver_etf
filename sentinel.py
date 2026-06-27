@@ -182,10 +182,19 @@ def build_daily_briefing(state_db):
     # Condition E (Status Normal)
     else:
         subject = "All okay keep holding"
-        body = f"STATUS NORMAL: Market is breathing safely at ₹{price:,.2f}.\n\nActive Target Rung: ₹{active_rung:,.2f}\nMacro Anchor Status:\n- SLV Physical Trend: {vault_trend:+.2f}%\n- Nifty 50 P/E: {nifty_pe}\n- Nifty 50 P/B: {nifty_pb}\n- Gold/Silver Ratio: {gsr}\n\nClose your brokerage app and ignore the market."
+        body = f"STATUS NORMAL: Market is breathing safely at ₹{price:,.2f}.\n\nClose your brokerage app and ignore the market."
         
-    footer = """
-    
+    metrics_summary = f"""
+Active Target Rung: ₹{active_rung:,.2f}
+Macro Anchor Status:
+- SLV Physical Trend: {vault_trend:+.2f}%
+- Nifty 50 P/E: {nifty_pe}
+- Nifty 50 P/B: {nifty_pb}
+- Gold/Silver Ratio: {gsr}
+"""
+
+    footer = f"""
+{metrics_summary}
 --------------------------------------------------
 HOW TO READ THIS EMAIL (Plain English Guide):
 - What is this? This is an automated robot that watches your silver investments and the stock market every morning.
