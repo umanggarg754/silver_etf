@@ -166,13 +166,13 @@ def build_daily_briefing(state_db):
     elif is_monday and price >= active_rung and nifty_pe <= 22.5 and nifty_pb <= 3.8:
         new_rung = state_db.increment_target_rung()
         subject = "Sell today definitely"
-        body = f"EXECUTION MONDAY: Target rung (₹{active_rung:,.2f}) achieved with Silver at ₹{price:,.2f}.\n\nValuation checks pass (Nifty P/E: {nifty_pe}, P/B: {nifty_pb}).\n\nCommand: Sell exactly 5% of silver units blindly; rotate cash into Nifty 50 index.\nThe next target rung has been locked at ₹{new_rung:,.2f}."
+        body = f"EXECUTION MONDAY: Target rung (₹{active_rung:,.2f}) achieved with Silver at ₹{price:,.2f}.\n\nValuation checks pass (Nifty P/E: {nifty_pe}, P/B: {nifty_pb}).\n\nCommand: Sell exactly 1000 shares of your Silver ETF (equivalent to 1 kg) blindly; rotate cash into Nifty 50 index.\nThe next target rung has been locked at ₹{new_rung:,.2f}."
     
     # Condition C (Overvalued Market Sweep)
     elif is_monday and price >= active_rung and (nifty_pe > 22.5 or nifty_pb > 3.8):
         new_rung = state_db.increment_target_rung()
         subject = "Sell today definitely - SWEEP TO LIQUID DEBT"
-        body = f"EXECUTION MONDAY: Target rung (₹{active_rung:,.2f}) achieved with Silver at ₹{price:,.2f}.\n\nEquity Valuations are in BUBBLE TERRITORY (Nifty P/E: {nifty_pe}, P/B: {nifty_pb}).\n\nCommand: Sell exactly 5% of silver units, but PARK CASH IN LIQUID DEBT FUNDS. Do not buy overvalued equities.\nThe next target rung has been locked at ₹{new_rung:,.2f}."
+        body = f"EXECUTION MONDAY: Target rung (₹{active_rung:,.2f}) achieved with Silver at ₹{price:,.2f}.\n\nEquity Valuations are in BUBBLE TERRITORY (Nifty P/E: {nifty_pe}, P/B: {nifty_pb}).\n\nCommand: Sell exactly 1000 shares of your Silver ETF (equivalent to 1 kg), but PARK CASH IN LIQUID DEBT FUNDS. Do not buy overvalued equities.\nThe next target rung has been locked at ₹{new_rung:,.2f}."
         
     # Condition D (Danger Zone Buffer)
     elif 205000 < price <= 212000:
@@ -201,7 +201,7 @@ HOW TO READ THIS EMAIL (Plain English Guide):
 - What should I do? Only take action if the email subject says "Warning" or "Sell today". If it says "All okay keep holding", do absolutely nothing and go about your day.
 - What are these numbers?
   * Silver Price: The true, tax-adjusted cost of 1kg of silver in India.
-  * Target Rung: The price silver needs to hit before we sell a small 5% chunk for profit.
+  * Target Rung: The price silver needs to hit before we sell exactly 1000 shares (1 kg) for profit.
   * SLV Trend: Measures physical silver supply. 
       [GOOD] = Negative or close to 0% (vaults are emptying, meaning high demand). 
       [BAD] = Above 3% (institutions are dumping physical silver back into vaults).
