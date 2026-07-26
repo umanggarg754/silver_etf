@@ -20,6 +20,9 @@ SMTP_PASS = os.getenv("SMTP_PASS", "your_app_password")
 NIFTY_PE = float(os.getenv("NIFTY_PE", "20.6"))
 NIFTY_PB = float(os.getenv("NIFTY_PB", "3.5"))
 
+# Tax & Duty Configuration
+SILVER_IMPORT_MULTIPLIER = float(os.getenv("SILVER_IMPORT_MULTIPLIER", "1.245"))
+
 STATE_FILE = "state.json"
 
 class StateDB:
@@ -44,7 +47,7 @@ class StateDB:
         
     def increment_target_rung(self):
         current = self.get_target_rung()
-        self.state["active_target_rung"] = current + 10000
+        self.state["active_target_rung"] = round(current * 1.04, 2)
         self.save()
         return self.state["active_target_rung"]
 
@@ -99,7 +102,7 @@ def fetch_market_confluence(state_db):
     try:
         si = yf.Ticker("SI=F").history(period="1d")["Close"].iloc[-1]
         usdinr = yf.Ticker("INR=X").history(period="1d")["Close"].iloc[-1]
-        calc_price = round(float(si * usdinr * 32.1507 * 1.245), 2)
+        calc_price = round(float(si * usdinr * 32.1507 * SILVER_IMPORT_MULTIPLIER), 2)
         
         # Hardcoded Support Floor Override (API Safeguard)
         if calc_price < 210000 and si >= 61.00:
@@ -166,13 +169,13 @@ def build_daily_briefing(state_db):
     elif is_monday and price >= active_rung and nifty_pe <= 22.5 and nifty_pb <= 3.8:
         new_rung = state_db.increment_target_rung()
         subject = "Sell today definitely"
-        body = f"EXECUTION MONDAY: Target rung (₹{active_rung:,.2f}) achieved with Silver at ₹{price:,.2f}.\n\nValuation checks pass (Nifty P/E: {nifty_pe}, P/B: {nifty_pb}).\n\nCommand: Sell exactly 1000 shares of your Silver ETF (equivalent to 1 kg) blindly; rotate cash into Nifty 50 index.\nThe next target rung has been locked at ₹{new_rung:,.2f}."
+        body = f"EXECUTION MONDAY: Target rung (₹{active_rung:,.2f}) achieved with Silver at ₹{price:,.2f}.\n\nValuation checks pass (Nifty P/E: {nifty_pe}, P/B: {nifty_pb}).\n\nCommand: Sell exactly 1000 shares of your Silver ETF (equivalent to 1 kg) blindly; rotate cash into Nifty 50 index.\nWARNING: Check ETF premium to iNAV before executing market order to avoid slippage.\nThe next target rung has been locked at ₹{new_rung:,.2f}."
     
     # Condition C (Overvalued Market Sweep)
     elif is_monday and price >= active_rung and (nifty_pe > 22.5 or nifty_pb > 3.8):
         new_rung = state_db.increment_target_rung()
         subject = "Sell today definitely - SWEEP TO LIQUID DEBT"
-        body = f"EXECUTION MONDAY: Target rung (₹{active_rung:,.2f}) achieved with Silver at ₹{price:,.2f}.\n\nEquity Valuations are in BUBBLE TERRITORY (Nifty P/E: {nifty_pe}, P/B: {nifty_pb}).\n\nCommand: Sell exactly 1000 shares of your Silver ETF (equivalent to 1 kg), but PARK CASH IN LIQUID DEBT FUNDS. Do not buy overvalued equities.\nThe next target rung has been locked at ₹{new_rung:,.2f}."
+        body = f"EXECUTION MONDAY: Target rung (₹{active_rung:,.2f}) achieved with Silver at ₹{price:,.2f}.\n\nEquity Valuations are in BUBBLE TERRITORY (Nifty P/E: {nifty_pe}, P/B: {nifty_pb}).\n\nCommand: Sell exactly 1000 shares of your Silver ETF (equivalent to 1 kg), but PARK CASH IN LIQUID DEBT FUNDS. Do not buy overvalued equities.\nWARNING: Check ETF premium to iNAV before executing market order to avoid slippage.\nThe next target rung has been locked at ₹{new_rung:,.2f}."
         
     # Condition D (Danger Zone Buffer)
     elif 205000 < price <= 212000:

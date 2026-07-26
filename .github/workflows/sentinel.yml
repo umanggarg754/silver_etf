@@ -34,6 +34,7 @@ jobs:
         SMTP_PASS: ${{ secrets.SMTP_PASS }}
         SMTP_SERVER: ${{ secrets.SMTP_SERVER || 'smtp.gmail.com' }}
         SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
+        SILVER_IMPORT_MULTIPLIER: ${{ secrets.SILVER_IMPORT_MULTIPLIER || '1.245' }}
       run: |
         python sentinel.py
 
